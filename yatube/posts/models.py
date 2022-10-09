@@ -42,8 +42,8 @@ class Post(models.Model):
         help_text='Картинка с определенными полями',
         upload_to='posts/',
         blank=True
-    ) 
-    
+    )
+
     def __str__(self) -> str:
         return self.text
 
@@ -73,7 +73,7 @@ class Comment(models.Model):
         help_text='наверно что то создалось',
         auto_now_add=True,
     )
-    
+
     class Meta:
         ordering = ('-created', )
 
@@ -83,12 +83,12 @@ class Follow(models.Model):
         User,
         related_name='follower',
         on_delete=models.CASCADE
-        )
+    )
     author = models.ForeignKey(
         User,
         related_name='following',
         on_delete=models.CASCADE
-        )
+    )
 
     class Meta:
         ordering = ('-author',)

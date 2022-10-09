@@ -1,7 +1,5 @@
 from django.test import Client, TestCase
-from django.urls import reverse
 from posts.models import Group, Post, User
-from django.core.cache import cache
 
 
 class CacheTests(TestCase):
@@ -28,7 +26,6 @@ class CacheTests(TestCase):
         self.authorized_client.force_login(self.user)
         self.authorized_client_author = Client()
         self.authorized_client_author.force_login(self.post.author)
-
 
     # Проверяем используемые шаблоны
     def test_cache_index(self):

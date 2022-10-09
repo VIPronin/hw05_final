@@ -11,6 +11,7 @@ import tempfile
 # на момент теста медиа папка будет переопределена
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
+
 # Для сохранения media-файлов в тестах будет использоваться
 # временная папка TEMP_MEDIA_ROOT, а потом мы ее удалим
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
@@ -38,13 +39,13 @@ class PostFormTests(TestCase):
         # Для тестирования загрузки изображений
         # берём байт-последовательность картинки,
         # состоящей из двух пикселей: белого и чёрного
-        self.small_gif = (            
-             b'\x47\x49\x46\x38\x39\x61\x02\x00'
-             b'\x01\x00\x80\x00\x00\x00\x00\x00'
-             b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
-             b'\x00\x00\x00\x2C\x00\x00\x00\x00'
-             b'\x02\x00\x01\x00\x00\x02\x02\x0C'
-             b'\x0A\x00\x3B'
+        self.small_gif = (
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B'
         )
         self.uploaded = SimpleUploadedFile(
             name='small.gif',
@@ -138,6 +139,7 @@ class LableHelpTextFormTests(TestCase):
         self.assertEqual(
             title_help_text, 'Если нет подходящей группы - пиши админу')
 
+
 class CommentFormTests(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -167,7 +169,7 @@ class CommentFormTests(TestCase):
         # Для тестирования загрузки изображений
         # берём байт-последовательность картинки,
         # состоящей из двух пикселей: белого и чёрного
-       
+
     def test_create_comment(self):
         """комментировать посты может только авторизованный пользователь"""
         # Подсчитаем количество записей в Comment

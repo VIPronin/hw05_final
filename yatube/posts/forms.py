@@ -1,5 +1,5 @@
 from django import forms
-from .models import Post, Comment, Follow
+from .models import Post, Comment
 from .constants import NUM_of_letters
 
 
