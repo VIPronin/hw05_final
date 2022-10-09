@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  <h1>Данные подписчика</h1>
+{% endblock %}
+
+{% block content %}
+  <article>
+    {% include 'includes/switcher.html' %}
+    {% for post in page_obj %}
+    {% include 'includes/post_head.html' %}   
+  <p>
+    {{ post.text }}</p>
+      {%if post.group%}
+      <a href="{% url 'posts:group_posts' post.group.slug %}">все записи группы</a> - <a href="{% url 'posts:group_posts' post.group.slug %}"><span style="color:green"><b>{{ post.group }}</b><span></a>
+      {% endif %}
+    {% if not forloop.last %}<hr>{% endif %}
+  {% endfor %}
+  {% include 'includes/paginator.html' %}
+</article>
+{% endblock %}

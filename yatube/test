@@ -1,0 +1,35 @@
+from functools import wraps
+
+
+def cache3(func):
+    count = 0
+    result = func()
+    cache = {}
+    while count <=3:
+        count += 1
+    def wrapper():
+        if count <=3:
+            return result
+        else:
+            return func()
+    return wrapper               
+
+
+@cache3
+def heavy():
+    print('Сложные вычисления')
+    return 1
+
+
+print(heavy())
+# Сложные вычисления
+# 1
+print(heavy())
+# 1
+print(heavy())
+# 1
+
+# Опять кеш устарел, надо вычислять заново
+print(heavy())
+# Сложные вычисления
+# 1
