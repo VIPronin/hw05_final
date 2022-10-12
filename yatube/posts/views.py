@@ -7,6 +7,7 @@ from .models import Comment, Follow, Group, Post, User
 from .forms import CommentForm, PostForm
 from .utils import get_paginator
 
+
 @cache_page(20)
 def index(request):
     title = 'Главная страница'

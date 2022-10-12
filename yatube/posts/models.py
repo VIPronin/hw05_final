@@ -90,7 +90,7 @@ class Follow(models.Model):
         User,
         related_name='following',
         on_delete=models.CASCADE,
-        validators = [validate_not_follow_twice]
+        validators=[validate_not_follow_twice]
     )
 
     class Meta:
