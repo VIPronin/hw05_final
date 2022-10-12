@@ -1,11 +1,11 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Group, Post, User, Comment, Follow
-from .forms import PostForm, CommentForm
-from django.contrib.auth.decorators import login_required
-from .utils import get_paginator
-from django.views.decorators.cache import cache_page
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.cache import cache_page
 
+from .models import Comment, Follow, Group, Post, User
+from .forms import CommentForm, PostForm
+from .utils import get_paginator
 
 @cache_page(20)
 def index(request):
@@ -45,7 +45,7 @@ def profile(request, username):
 def post_detail(request, post_id):
     title = 'Информация о посте'
     post = get_object_or_404(Post, pk=post_id)
-    comments = Comment.objects.filter(post=post.id)
+    comments = get_object_or_404(Comment, post=post.id)
     form = CommentForm()
     context = dict(
         post=post,
@@ -79,7 +79,7 @@ def post_create(request):
 @login_required()
 def post_edit(request, post_id):
     title = 'Редактирование поста',
-    post = Post.objects.get(pk=post_id)
+    post = get_object_or_404(Post, pk=post_id)
     if post.author != request.user:
         return redirect('posts:post_detail', post_id=post_id)
     form = PostForm(
@@ -103,7 +103,7 @@ def post_edit(request, post_id):
 @login_required
 def add_comment(request, post_id):
     # Получите пост
-    post = Post.objects.get(pk=post_id)
+    post = get_object_or_404(Post, pk=post_id)
     form = CommentForm(request.POST or None)
     if form.is_valid():
         comment = form.save(commit=False)

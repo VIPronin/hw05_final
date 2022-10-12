@@ -1,6 +1,8 @@
 from django.test import TestCase
-from ..models import Group, Post, User
+
 from posts.constants import LEN_SIMBOLS_IN_POST
+
+from ..models import Group, Post, User
 
 
 class PostModelTest(TestCase):

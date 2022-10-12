@@ -1,8 +1,9 @@
-from django.test import TestCase, Client
-from ..models import Group, Post, User
 from http import HTTPStatus
-from django.core.cache import cache
 
+from django.core.cache import cache
+from django.test import TestCase, Client
+
+from ..models import Group, Post, User
 
 TEMPLATE_URL_NAMES = {
     '/': 'posts/index.html',

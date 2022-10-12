@@ -1,11 +1,14 @@
+import tempfile
+
 from http import HTTPStatus
-from ..forms import PostForm
-from ..models import Group, Post, User, Comment
-from django.test import Client, TestCase, override_settings
-from django.urls import reverse
+
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.conf import settings
-import tempfile
+from django.test import Client, TestCase, override_settings
+from django.urls import reverse
+
+from ..forms import PostForm
+from ..models import Comment, Group, Post, User
 
 # Создаем временную папку для медиа-файлов;
 # на момент теста медиа папка будет переопределена

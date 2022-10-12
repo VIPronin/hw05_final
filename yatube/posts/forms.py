@@ -1,6 +1,7 @@
 from django import forms
-from .models import Post, Comment
-from .constants import NUM_of_letters
+
+from .constants import NUM_OF_LETTERS
+from .models import Comment, Post
 
 
 class PostForm(forms.ModelForm):
@@ -34,7 +35,7 @@ class CommentForm(forms.ModelForm):
     def clean_text(self):
         data = self.cleaned_data['text']
         max_length = len(data)
-        if max_length <= NUM_of_letters:
+        if max_length <= NUM_OF_LETTERS:
             raise forms.ValidationError('Кажется ты что забыл сделать! '
                                         'Поле обязательно для заполнения')
         return data

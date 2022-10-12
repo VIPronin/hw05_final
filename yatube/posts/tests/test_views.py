@@ -1,12 +1,14 @@
+import tempfile
+
+from django import forms
+from django.core.cache import cache
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.conf import settings
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
-from django import forms
-from posts.models import Group, Post, User, Follow
+
 from posts.constants import POSTS_PER_PAGE
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.cache import cache
-from django.conf import settings
-import tempfile
+from posts.models import Follow, Group, Post, User
 
 
 # Создаем временную папку для медиа-файлов;

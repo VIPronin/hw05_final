@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
+from .validators import validate_not_follow_twice
+
 User = get_user_model()
 
 
@@ -48,7 +50,7 @@ class Post(models.Model):
         return self.text
 
     class Meta():
-        ordering = ['-pub_date']
+        ordering = ('-pub_date', )
 
 
 class Comment(models.Model):
@@ -87,8 +89,9 @@ class Follow(models.Model):
     author = models.ForeignKey(
         User,
         related_name='following',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        validators = [validate_not_follow_twice]
     )
 
     class Meta:
-        ordering = ('-author',)
+        ordering = ('-author', )

@@ -4,7 +4,7 @@
 POSTS_PER_PAGE = 10
 
 # колличество букв при создании поста в формах
-NUM_of_letters = 10
+NUM_OF_LETTERS = 10
 
 
 # TESTS
