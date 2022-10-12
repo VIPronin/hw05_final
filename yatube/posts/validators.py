@@ -2,8 +2,7 @@ from django.core.exceptions import ValidationError
 
 
 def validate_not_follow_twice(value):
-# Проверка
-    if value == 'author':
+    if value == 'author':  # Проверка
         raise ValidationError(
             'Вы уже подписались на этого автора',
             params={'value': value},
