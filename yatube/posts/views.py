@@ -46,7 +46,7 @@ def profile(request, username):
 def post_detail(request, post_id):
     title = 'Информация о посте'
     post = get_object_or_404(Post, pk=post_id)
-    comments = get_object_or_404(Comment, post=post.id)
+    comments = Comment.objects.filter(post=post.id)
     form = CommentForm()
     context = dict(
         post=post,

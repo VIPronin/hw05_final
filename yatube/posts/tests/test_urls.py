@@ -5,15 +5,6 @@ from django.test import TestCase, Client
 
 from ..models import Group, Post, User
 
-TEMPLATE_URL_NAMES = {
-    '/': 'posts/index.html',
-    '/profile/HasNoName/': 'posts/profile.html',
-    '/create/': 'posts/create_post.html',
-    '/group/test-slug/': 'posts/group_list.html',
-    '/posts/20/': 'posts/post_detail.html',
-    '/posts/20/edit/': 'posts/create_post.html',
-}
-
 
 class PostURLTests(TestCase):
     @classmethod
@@ -30,7 +21,6 @@ class PostURLTests(TestCase):
         cls.post = Post.objects.create(
             author=cls.user,
             text='Тестовый пост',
-            pk='20'
         )
 
     def setUp(self):
@@ -45,6 +35,7 @@ class PostURLTests(TestCase):
         self.authorized_client_author = Client()
         self.authorized_client_author.force_login(self.post.author)
         self.access_for_auth = {
+            '/follow/': 'posts/follow.html',
             f'/posts/{self.post.pk}/': 'posts/post_detail.html',
             f'/posts/{self.post.pk}/edit/': 'posts/create_post.html',
         }
@@ -63,9 +54,9 @@ class PostURLTests(TestCase):
     def test_access_for_auth_users(self):
         """Страницы доступна автору."""
         for link_auth, name_auth in self.access_for_auth.items():
-            with self.subTest(name_auth=name_auth):
-                response = self.authorized_client_author.get(link_auth)
-                self.assertEqual(response.status_code, HTTPStatus.OK)
+            with self.subTest(link_auth=link_auth):
+                response = self.authorized_client_author.get(name_auth)
+                self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_access_for_all_users(self):
         """Страницы доступна всем авторизованным пользователям."""
@@ -76,9 +67,9 @@ class PostURLTests(TestCase):
 
     def test_access_for_Not_auth_users(self):
         """Страницы доступна всем не авторизованным пользователям."""
-        for link_auth, name_auth in self.access_fore_not_auth.items():
+        for link_not_auth, name_auth in self.access_fore_not_auth.items():
             with self.subTest(name_auth=name_auth):
-                response = self.guest_client.get(link_auth)
+                response = self.guest_client.get(link_not_auth)
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_another_user_cant_edit_foreign_posts(self):
@@ -96,7 +87,15 @@ class PostURLTests(TestCase):
     def test_urls_uses_correct_template(self):
         cache.clear()
         # Шаблоны по адресам
-        for address, template in TEMPLATE_URL_NAMES.items():
+        templates_url_names = { 
+            '/': 'posts/index.html',
+            '/follow/': 'posts/follow.html',
+            f'/group/{self.group.slug}/': 'posts/group_list.html',
+            f'/profile/{self.user.username}/': 'posts/profile.html',
+            '/create/': 'posts/create_post.html',
+            f'/posts/{self.post.id}/edit/': 'posts/create_post.html'
+        } 
+        for address, template in templates_url_names.items():
             with self.subTest(address=address):
                 response = self.authorized_client_author.get(address)
                 error_name: str = f'ОШИБКА: {address}, ВОТ ТУТ {template}'

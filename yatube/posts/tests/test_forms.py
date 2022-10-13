@@ -183,8 +183,7 @@ class CommentFormTests(TestCase):
         }
         response = self.authorized_client.post(
             reverse('posts:add_comment', kwargs={'post_id': self.post.id}),
-            data=form_data,
-            follow=True
+            data=form_data
         )
         # Проверяем, сработал ли редирект
         # self.assertRedirects(response, reverse(
@@ -194,4 +193,4 @@ class CommentFormTests(TestCase):
         # Проверяем, что создалась запись с нашим слагом
         post = self.comment
         self.assertEqual(post.text, self.comment.text)
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)

@@ -1,3 +1,4 @@
+import shutil 
 import tempfile
 
 from django import forms
@@ -58,6 +59,11 @@ class PostURLTests(TestCase):
             content_type='image/gif'
         )
 
+    @classmethod 
+    def tearDownClass(cls): 
+        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
+        super().tearDownClass()
+
     # Проверяем используемые шаблоны
     def test_pages_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
@@ -69,9 +75,6 @@ class PostURLTests(TestCase):
             reverse('posts:profile',
                     kwargs={'username':
                             self.user.username}): 'posts/profile.html',
-            reverse('posts:post_detail',
-                    kwargs={'post_id':
-                            self.post.pk}): 'posts/post_detail.html',
             reverse('posts:post_create'): 'posts/create_post.html',
             reverse('posts:post_edit',
                     kwargs={'post_id':
@@ -141,9 +144,10 @@ class PostURLTests(TestCase):
         """Шаблон post_detail сформирован с правильным контекстом."""
         response = self.authorized_client.get(
             reverse('posts:post_detail', kwargs={'post_id': self.post.id}))
-        post = {response.context['post'].text: 'Тестовый пост',
-                response.context['post'].group: self.group,
-                response.context['post'].author: self.user.username}
+        post = {response.context['post_id'].text: self.post.text,
+                response.context['post_id'].group: self.group,
+                response.context['post_id'].author: self.user.username}
+        print(response.context)
         for value, expected in post.items():
             self.assertEqual(post[value], expected)
 
