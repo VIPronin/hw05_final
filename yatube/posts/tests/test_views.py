@@ -1,4 +1,4 @@
-import shutil 
+import shutil
 import tempfile
 
 from django import forms
@@ -59,8 +59,8 @@ class PostURLTests(TestCase):
             content_type='image/gif'
         )
 
-    @classmethod 
-    def tearDownClass(cls): 
+    @classmethod
+    def tearDownClass(cls):
         shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
         super().tearDownClass()
 
@@ -75,8 +75,8 @@ class PostURLTests(TestCase):
             reverse('posts:profile',
                     kwargs={'username':
                             self.user.username}): 'posts/profile.html',
-            reverse('posts:post_detail', 
-                    kwargs={'post_id': 
+            reverse('posts:post_detail',
+                    kwargs={'post_id':
                             self.post.id}): 'posts/post_detail.html',
             reverse('posts:post_create'): 'posts/create_post.html',
             reverse('posts:post_edit',

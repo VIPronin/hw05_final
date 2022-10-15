@@ -87,14 +87,14 @@ class PostURLTests(TestCase):
     def test_urls_uses_correct_template(self):
         cache.clear()
         # Шаблоны по адресам
-        templates_url_names = { 
+        templates_url_names = {
             '/': 'posts/index.html',
             '/follow/': 'posts/follow.html',
             f'/group/{self.group.slug}/': 'posts/group_list.html',
             f'/profile/{self.user.username}/': 'posts/profile.html',
             '/create/': 'posts/create_post.html',
             f'/posts/{self.post.id}/edit/': 'posts/create_post.html'
-        } 
+        }
         for address, template in templates_url_names.items():
             with self.subTest(address=address):
                 response = self.authorized_client_author.get(address)

@@ -169,9 +169,6 @@ class CommentFormTests(TestCase):
         self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
-        # Для тестирования загрузки изображений
-        # берём байт-последовательность картинки,
-        # состоящей из двух пикселей: белого и чёрного
 
     def test_create_comment(self):
         """комментировать посты может только авторизованный пользователь"""
@@ -185,9 +182,6 @@ class CommentFormTests(TestCase):
             reverse('posts:add_comment', kwargs={'post_id': self.post.id}),
             data=form_data
         )
-        # Проверяем, сработал ли редирект
-        # self.assertRedirects(response, reverse(
-        #     'post_detail', kwargs={'post_id': self.post.pk}))
         # Проверяем, увеличилось ли число постов
         self.assertEqual(Comment.objects.count(), comment_count + 1)
         # Проверяем, что создалась запись с нашим слагом
