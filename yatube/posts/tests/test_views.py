@@ -75,10 +75,13 @@ class PostURLTests(TestCase):
             reverse('posts:profile',
                     kwargs={'username':
                             self.user.username}): 'posts/profile.html',
+            reverse('posts:post_detail', 
+                    kwargs={'post_id': 
+                            self.post.id}): 'posts/post_detail.html',
             reverse('posts:post_create'): 'posts/create_post.html',
             reverse('posts:post_edit',
                     kwargs={'post_id':
-                            self.post.pk}): 'posts/create_post.html',
+                            self.post.id}): 'posts/create_post.html',
         }
         # Проверяем, что при обращении к name
         # вызывается соответствующий HTML-шаблон
@@ -144,12 +147,13 @@ class PostURLTests(TestCase):
         """Шаблон post_detail сформирован с правильным контекстом."""
         response = self.authorized_client.get(
             reverse('posts:post_detail', kwargs={'post_id': self.post.id}))
-        post = {response.context['post_id'].text: self.post.text,
-                response.context['post_id'].group: self.group,
-                response.context['post_id'].author: self.user.username}
+        post = {response.context['post'].text: self.post.text,
+                response.context['post'].group: self.group,
+                response.context['post'].author: self.user.username}
         print(response.context)
         for value, expected in post.items():
             self.assertEqual(post[value], expected)
+    #    self.assertEqual(response.context.get('self.post'), self.post.text)
 
     def test_post_create_page_show_correct_context(self):
         """Шаблон post_create сформирован с правильным контекстом."""

@@ -46,12 +46,11 @@ def profile(request, username):
 def post_detail(request, post_id):
     title = 'Информация о посте'
     post = get_object_or_404(Post, pk=post_id)
-    comments = Comment.objects.filter(post=post.id)
     form = CommentForm()
     context = dict(
         post=post,
         title=title,
-        comments=comments,
+        comments=post.comments.all(),
         form=form
     )
     return render(request, 'posts/post_detail.html', context)

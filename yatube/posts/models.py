@@ -76,6 +76,9 @@ class Comment(models.Model):
         auto_now_add=True,
     )
 
+    def __str__(self) -> str:
+        return self.text
+        
     class Meta:
         ordering = ('-created', )
 
@@ -95,3 +98,5 @@ class Follow(models.Model):
 
     class Meta:
         ordering = ('-author', )
+        constraints = (models.UniqueConstraint(fields=('author', 'user'),
+                                               name='unique subscription'))
