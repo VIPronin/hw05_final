@@ -61,11 +61,12 @@ class PostURLTests(TestCase):
             reverse('posts:group_posts',
                     kwargs={'slug': 'test-slug'}): 'posts/group_list.html',
             reverse('posts:profile',
-                    kwargs={'username': cls.user.username}): 'posts/profile.html',
+                    kwargs={'username':
+                            cls.user.username}): 'posts/profile.html',
             reverse('posts:post_detail',
                     kwargs={'post_id':
                             cls.post.id}): 'posts/post_detail.html',
-            reverse('posts:post_create'):'posts/create_post.html',
+            reverse('posts:post_create'): 'posts/create_post.html',
             reverse('posts:post_edit',
                     kwargs={'post_id':
                             cls.post.id}): 'posts/create_post.html'
