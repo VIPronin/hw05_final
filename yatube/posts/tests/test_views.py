@@ -57,19 +57,18 @@ class PostURLTests(TestCase):
         # Проверяем, что при обращении к name
         # вызывается соответствующий HTML-шаблон
         cls.url_templates = {
-            'posts/index.html': reverse('posts:index'),
-            'posts/group_list.html': reverse('posts:group_posts',
-                                             kwargs={'slug': 'test-slug'}),
-            'posts/profile.html': reverse('posts:profile',
-                                          kwargs={'username':
-                                                  cls.user.username}),
-            'posts/post_detail.html': reverse('posts:post_detail',
-                                              kwargs={'post_id':
-                                                      cls.post.id}),
-            'posts/create_post.html': reverse('posts:post_create'),
-            'posts/create_post.html': reverse('posts:post_edit',
-                                              kwargs={'post_id':
-                                                      cls.post.id})
+            reverse('posts:index'): 'posts/index.html',
+            reverse('posts:group_posts',
+                    kwargs={'slug': 'test-slug'}): 'posts/group_list.html',
+            reverse('posts:profile',
+                    kwargs={'username': cls.user.username}): 'posts/profile.html',
+            reverse('posts:post_detail',
+                    kwargs={'post_id':
+                            cls.post.id}): 'posts/post_detail.html',
+            reverse('posts:post_create'):'posts/create_post.html',
+            reverse('posts:post_edit',
+                    kwargs={'post_id':
+                            cls.post.id}): 'posts/create_post.html'
         }
 
     def setUp(self):
@@ -102,7 +101,7 @@ class PostURLTests(TestCase):
     # Проверяем используемые шаблоны
     def test_pages_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
-        for template, reverse_name in self.url_templates.items():
+        for reverse_name, template in self.url_templates.items():
             with self.subTest(template=template):
                 response = self.authorized_client_author.get(reverse_name)
                 self.assertTemplateUsed(response, template)
@@ -123,7 +122,7 @@ class PostURLTests(TestCase):
         post = response.context['page_obj'][0]
         post_confirm = len(response.context['page_obj'])
         self.assertEqual(post.text, self.post.text)
-        self.assertEqual(post_confirm, 1)        
+        self.assertEqual(post_confirm, 1)
 
     def test_profile_page_show_correct_context(self):
         """Шаблон profile сформирован с правильным контекстом."""
