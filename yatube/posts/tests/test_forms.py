@@ -1,3 +1,4 @@
+import shutil
 import tempfile
 
 from http import HTTPStatus
@@ -10,6 +11,16 @@ from django.urls import reverse
 from ..forms import PostForm
 from ..models import Comment, Group, Post, User
 
+USER_NAME = 'auth'
+
+GROUP_NAME = 'Тестовая группа'
+GROUP_DESCRIPTION = 'Тестовое описание'
+
+GROUP_SLUG = 'test-slug'
+
+POST_TEXT = 'Тестовый пост'
+COMMENT_TEXT = 'Тестовый текст'
+FILE_NAME_FOR_TEST = 'small.gif'
 # Создаем временную папку для медиа-файлов;
 # на момент теста медиа папка будет переопределена
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
@@ -22,16 +33,16 @@ class PostFormTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.user = User.objects.create(username='auth')
+        cls.user = User.objects.create(username=USER_NAME)
         cls.group = Group.objects.create(
-            title='Тестовая группа',
-            slug='test-slug',
-            description='Тестовое описание',
+            title=GROUP_NAME,
+            slug=GROUP_SLUG,
+            description=GROUP_DESCRIPTION,
         )
         cls.post = Post.objects.create(
             author=cls.user,
             group=cls.group,
-            text='Тестовый текст',
+            text=POST_TEXT,
         )
 
     def setUp(self):
@@ -51,10 +62,21 @@ class PostFormTests(TestCase):
             b'\x0A\x00\x3B'
         )
         self.uploaded = SimpleUploadedFile(
-            name='small.gif',
+            name=FILE_NAME_FOR_TEST,
             content=self.small_gif,
             content_type='image/gif'
         )
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
+        super().tearDownClass()
+
+    def post_asserts(self, post):
+        post = Post.objects.first()
+        self.assertEqual(post.text, self.post.text)
+        self.assertEqual(post.group, self.post.group)
+        self.assertEqual(post.author, self.post.author)
 
     def test_create_post(self):
         """Валидная форма создает запись в Post."""
@@ -62,7 +84,7 @@ class PostFormTests(TestCase):
         posts_count = Post.objects.count()
         # Подготавливаем данные для передачи в форму
         form_data = {
-            'text': 'Тестовый текст',
+            'text': POST_TEXT,
             'group': self.group.id,
             'image': self.uploaded
         }
@@ -78,9 +100,7 @@ class PostFormTests(TestCase):
         self.assertEqual(Post.objects.count(), posts_count + 1)
         # Проверяем, что создалась запись с нашим слагом
         post = Post.objects.first()
-        self.assertEqual(post.text, self.post.text)
-        self.assertEqual(post.group, self.post.group)
-        self.assertEqual(post.author, self.post.author)
+        self.post_asserts(post)
         self.assertEqual(post.image, f'posts/{self.uploaded}')  # check after
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
@@ -89,7 +109,7 @@ class PostFormTests(TestCase):
         # понять почему не могу обратиться к cls.post = Post.objects.create
         # Подготавливаем данные для передачи в форму
         self.post = Post.objects.create(
-            text='Тестовый текст',
+            text=POST_TEXT,
             group=self.group,
             author=self.user
         )
@@ -97,7 +117,7 @@ class PostFormTests(TestCase):
         fix_post = self.post
         # делаю новый словарь
         form_data = {
-            'text': 'Тестовый текст',
+            'text': POST_TEXT,
             'group': self.group.id,
         }
         # сравниваю. не забыть проставить .id к посту
@@ -108,9 +128,7 @@ class PostFormTests(TestCase):
         )
         # Проверяем, что создалась запись и тест не упал
         post = Post.objects.first()
-        self.assertEqual(post.text, self.post.text)
-        self.assertEqual(post.group, self.post.group)
-        self.assertEqual(post.author, self.post.author)
+        self.post_asserts(post)
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
 
@@ -147,21 +165,21 @@ class CommentFormTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.user = User.objects.create(username='auth')
+        cls.user = User.objects.create_user(username=USER_NAME)
         cls.group = Group.objects.create(
-            title='Тестовая группа',
-            slug='test-slug',
-            description='Тестовое описание',
+            title=GROUP_NAME,
+            slug=GROUP_SLUG,
+            description=GROUP_DESCRIPTION,
         )
         cls.post = Post.objects.create(
             author=cls.user,
             group=cls.group,
-            text='Тестовый текст',
+            text=POST_TEXT,
         )
         cls.comment = Comment.objects.create(
             author=cls.user,
             post_id=cls.post.id,
-            text='Тестовый коммент',
+            text=COMMENT_TEXT,
         )
 
     def setUp(self):
@@ -176,7 +194,7 @@ class CommentFormTests(TestCase):
         comment_count = Comment.objects.count()
         # Подготавливаем данные для передачи в форму
         form_data = {
-            'text': 'Тестовый коммент'
+            'text': COMMENT_TEXT
         }
         response = self.authorized_client.post(
             reverse('posts:add_comment', kwargs={'post_id': self.post.id}),

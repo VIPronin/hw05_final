@@ -5,6 +5,15 @@ from django.test import TestCase, Client
 
 from ..models import Group, Post, User
 
+USER_NAME = 'auth'
+USER_NAME_2 = 'HasNoName'
+
+GROUP_NAME = 'Тестовая группа'
+GROUP_SLUG = 'test-slug'
+GROUP_DESCRIPTION = 'Тестовое описание'
+
+POST_TEXT = 'Тестовый пост'
+
 
 class PostURLTests(TestCase):
     @classmethod
@@ -12,22 +21,22 @@ class PostURLTests(TestCase):
         """Тест модели приложения Posts.
         Создание тестового пользователя и экземпляр модели"""
         super().setUpClass()
-        cls.user = User.objects.create_user(username='author')
+        cls.user = User.objects.create(username=USER_NAME)
         cls.group = Group.objects.create(
-            title='Тестовая группа',
-            slug='test-slug',
-            description='Тестовое описание',
+            title=GROUP_NAME,
+            slug=GROUP_SLUG,
+            description=GROUP_DESCRIPTION,
         )
         cls.post = Post.objects.create(
             author=cls.user,
-            text='Тестовый пост',
+            text=POST_TEXT,
         )
 
     def setUp(self):
         # Создаем неавторизованный клиент
         self.guest_client = Client()
         # Создаем пользователя
-        self.user = User.objects.create(username='HasNoName')
+        self.user = User.objects.create(username=USER_NAME_2)
         # Создаем второй клиент
         self.authorized_client = Client()
         # Авторизуем пользователя

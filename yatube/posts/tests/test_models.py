@@ -1,8 +1,17 @@
 from django.test import TestCase
 
-from posts.constants import LEN_SIMBOLS_IN_POST
+from posts.tests.constants import LEN_SIMBOLS_IN_POST
 
 from ..models import Group, Post, User
+
+USER_NAME = 'auth'
+
+GROUP_NAME = 'Тестовая группа'
+GROUP_DESCRIPTION = 'Тестовое описание'
+
+GROUP_SLUG = 'test-slug'
+
+POST_TEXT = 'Тестовый пост'
 
 
 class PostModelTest(TestCase):
@@ -11,18 +20,19 @@ class PostModelTest(TestCase):
         """Тест модели приложения Posts.
         Создание тестового пользователя и экземпляр модели"""
         super().setUpClass()
-        cls.user = User.objects.create_user(username='auth')
+        cls.user = User.objects.create(username=USER_NAME)
         cls.group = Group.objects.create(
-            title='Тестовая группа',
-            slug='Тестовый слаг',
-            description='Тестовое описание',
+            title=GROUP_NAME,
+            slug=GROUP_SLUG,
+            description=GROUP_DESCRIPTION,
         )
         cls.post = Post.objects.create(
             author=cls.user,
-            text='Тестовый пост',
+            group=cls.group,
+            text=POST_TEXT,
         )
 
-    def test_verbose_name(self):
+    def test_verbose_name_Post(self):
         """verbose_name в полях совпадает с ожидаемым."""
         post = PostModelTest.post
         field_verboses = {

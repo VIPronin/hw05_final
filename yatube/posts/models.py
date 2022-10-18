@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.db.models import F, Q
 
 from .validators import validate_not_follow_twice
 
@@ -98,5 +99,6 @@ class Follow(models.Model):
 
     class Meta:
         ordering = ('-author', )
-        constraints = (models.UniqueConstraint(fields=('author', 'user'),
-                                               name='unique subscription'))
+        constraints = [
+            models.CheckConstraint(name='not_same', check=~Q(user=F('author')))
+        ]

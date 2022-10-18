@@ -11,7 +11,24 @@ from django.urls import reverse
 from posts.constants import POSTS_PER_PAGE
 from posts.models import Follow, Group, Post, User
 
+USER_NAME = 'auth'
+USER_NAME_2 = 'HasNoName'
+FOLLOWER_NAME = 'follower'
+FOLLOWING_NAME = 'following'
+USER_CACHE_NAME = 'test_name'
+USER_CACHE_NAME_CHERRY = 'cherry'
 
+GROUP_NAME = 'Тестовая группа'
+GROUP_DESCRIPTION = 'Тестовое описание'
+
+GROUP_SLUG = 'test-slug'
+
+POST_TEXT = 'Тестовый пост'
+COMMENT_TEXT = 'Тестовый текст'
+FILE_NAME_FOR_TEST = 'small.gif'
+FOLLOW_POST_TEXT = 'Тестовая запись подписчика'
+CACHE_POST_TEXT = 'Тестовая запись для создания поста'
+CACHE_INDEX_POST_TEXT = 'Измененный текст'
 # Создаем временную папку для медиа-файлов;
 # на момент теста медиа папка будет переопределена
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
@@ -25,22 +42,40 @@ class PostURLTests(TestCase):
     def setUpClass(cls):
         """Тест модели приложения Posts."""
         super().setUpClass()
-        cls.user = User.objects.create_user(username='auth')
+        cls.user = User.objects.create(username=USER_NAME)
         cls.group = Group.objects.create(
-            title='Тестовая группа',
-            slug='test-slug',
-            description='Тестовое описание',
+            title=GROUP_NAME,
+            slug=GROUP_SLUG,
+            description=GROUP_DESCRIPTION,
         )
         cls.post = Post.objects.create(
             author=cls.user,
             group=cls.group,
-            text='Тестовый пост',
+            text=POST_TEXT,
         )
+        # Собираем в словарь пары "имя_html_шаблона: reverse(name)"
+        # Проверяем, что при обращении к name
+        # вызывается соответствующий HTML-шаблон
+        cls.url_templates = {
+            'posts/index.html': reverse('posts:index'),
+            'posts/group_list.html': reverse('posts:group_posts',
+                                             kwargs={'slug': 'test-slug'}),
+            'posts/profile.html': reverse('posts:profile',
+                                          kwargs={'username':
+                                                  cls.user.username}),
+            'posts/post_detail.html': reverse('posts:post_detail',
+                                              kwargs={'post_id':
+                                                      cls.post.id}),
+            'posts/create_post.html': reverse('posts:post_create'),
+            'posts/create_post.html': reverse('posts:post_edit',
+                                              kwargs={'post_id':
+                                                      cls.post.id})
+        }
 
     def setUp(self):
         cache.clear()
         # Создаём авторизованный клиент
-        self.user = User.objects.create_user(username='HasNoName')
+        self.user = User.objects.create_user(username=USER_NAME_2)
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
         self.authorized_client_author = Client()
@@ -54,7 +89,7 @@ class PostURLTests(TestCase):
             b'\x0A\x00\x3B'
         )
         self.uploaded = SimpleUploadedFile(
-            name='small.gif',
+            name=FILE_NAME_FOR_TEST,
             content=self.small_gif,
             content_type='image/gif'
         )
@@ -67,25 +102,7 @@ class PostURLTests(TestCase):
     # Проверяем используемые шаблоны
     def test_pages_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
-        # Собираем в словарь пары "имя_html_шаблона: reverse(name)"
-        templates_page_names = {
-            reverse('posts:index'): 'posts/index.html',
-            reverse('posts:group_posts',
-                    kwargs={'slug': 'test-slug'}): 'posts/group_list.html',
-            reverse('posts:profile',
-                    kwargs={'username':
-                            self.user.username}): 'posts/profile.html',
-            reverse('posts:post_detail',
-                    kwargs={'post_id':
-                            self.post.id}): 'posts/post_detail.html',
-            reverse('posts:post_create'): 'posts/create_post.html',
-            reverse('posts:post_edit',
-                    kwargs={'post_id':
-                            self.post.id}): 'posts/create_post.html',
-        }
-        # Проверяем, что при обращении к name
-        # вызывается соответствующий HTML-шаблон
-        for reverse_name, template in templates_page_names.items():
+        for template, reverse_name in self.url_templates.items():
             with self.subTest(template=template):
                 response = self.authorized_client_author.get(reverse_name)
                 self.assertTemplateUsed(response, template)
@@ -95,21 +112,27 @@ class PostURLTests(TestCase):
         """Шаблон posts сформирован с правильным контекстом."""
         response = self.authorized_client.get(reverse('posts:index'))
         post = response.context['page_obj'][0]
+        post_confirm = len(response.context['page_obj'])
         self.assertEqual(post.text, self.post.text)
+        self.assertEqual(post_confirm, 1)
 
     def test_posts_Group_page_show_correct_context(self):
         """Шаблон Group сформирован с правильным контекстом."""
         response = self.authorized_client.get(reverse(
             'posts:group_posts', kwargs={'slug': self.group.slug}))
         post = response.context['page_obj'][0]
+        post_confirm = len(response.context['page_obj'])
         self.assertEqual(post.text, self.post.text)
+        self.assertEqual(post_confirm, 1)        
 
     def test_profile_page_show_correct_context(self):
         """Шаблон profile сформирован с правильным контекстом."""
         response = self.authorized_client.get(reverse(
             'posts:profile', kwargs={'username': self.post.author}))
         post = response.context['page_obj'][0]
+        post_confirm = len(response.context['page_obj'])
         self.assertEqual(post.text, self.post.text)
+        self.assertEqual(post_confirm, 1)
 
     def test_posts_group_show_new_page_index(self):
         """Шаблон index - дополнительная проверка при создании поста."""
@@ -150,7 +173,6 @@ class PostURLTests(TestCase):
         post = {response.context['post'].text: self.post.text,
                 response.context['post'].group: self.group,
                 response.context['post'].author: self.user.username}
-        print(response.context)
         for value, expected in post.items():
             self.assertEqual(post[value], expected)
     #    self.assertEqual(response.context.get('self.post'), self.post.text)
@@ -189,11 +211,11 @@ class PaginatorTests(TestCase):
         cache.clear()
         """Тест модели приложения Paginator."""
         super().setUpClass()
-        cls.user = User.objects.create_user(username='auth')
+        cls.user = User.objects.create_user(username=USER_NAME)
         cls.authorized_client = Client()
         cls.group = Group.objects.create(
-            title='Тестовая группа',
-            slug='test-slug',
+            title=GROUP_NAME,
+            slug=GROUP_SLUG,
         )
         cls.post = []
         for i in range(POSTS_PER_PAGE + 1):
@@ -204,7 +226,7 @@ class PaginatorTests(TestCase):
                     text=f'Тестовый пост {i}',))
         cls.pages_with_paginator = (
             reverse('posts:index'),
-            reverse('posts:group_posts', kwargs={'slug': 'test-slug'}),
+            reverse('posts:group_posts', kwargs={'slug': GROUP_SLUG}),
             reverse(
                 'posts:profile', kwargs={'username': cls.user.username})
         )
@@ -232,11 +254,11 @@ class FollowTests(TestCase):
         cache.clear()
         self.client_auth_follower = Client()
         self.client_auth_following = Client()
-        self.user_follower = User.objects.create_user(username='follower')
-        self.user_following = User.objects.create_user(username='following')
+        self.user_follower = User.objects.create(username=FOLLOWER_NAME)
+        self.user_following = User.objects.create(username=FOLLOWING_NAME)
         self.post = Post.objects.create(
             author=self.user_following,
-            text='Тестовая запись подписчика'
+            text=FOLLOW_POST_TEXT
         )
         self.client_auth_follower.force_login(self.user_follower)
         self.client_auth_following.force_login(self.user_following)
@@ -274,12 +296,12 @@ class CacheTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.post = Post.objects.create(
-            author=User.objects.create_user(username='test_name'),
-            text='Тестовая запись для создания поста')
+            author=User.objects.create(username=USER_CACHE_NAME),
+            text=CACHE_POST_TEXT)
 
     def setUp(self):
         self.guest_client = Client()
-        self.user = User.objects.create_user(username='cherry')
+        self.user = User.objects.create(username=USER_CACHE_NAME_CHERRY)
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
 
@@ -287,7 +309,7 @@ class CacheTests(TestCase):
         """Тест кэширования страницы index.html"""
         first_state = self.authorized_client.get(reverse('posts:index'))
         post_1 = Post.objects.get(pk=1)
-        post_1.text = 'Измененный текст'
+        post_1.text = CACHE_INDEX_POST_TEXT
         post_1.save()
         second_state = self.authorized_client.get(reverse('posts:index'))
         self.assertEqual(first_state.content, second_state.content)

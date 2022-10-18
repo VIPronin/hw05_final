@@ -2,27 +2,35 @@ from django.test import Client, TestCase
 
 from posts.models import Group, Post, User
 
+USER_NAME = 'auth'
+
+GROUP_NAME = 'Тестовая группа'
+GROUP_DESCRIPTION = 'Тестовое описание'
+
+GROUP_SLUG = 'test-slug'
+
+POST_TEXT = 'Тестовый пост'
+
 
 class CacheTests(TestCase):
     @classmethod
     def setUpClass(cls):
         """Тест модели приложения Posts."""
         super().setUpClass()
-        cls.user = User.objects.create_user(username='auth')
+        cls.user = User.objects.create(username=USER_NAME)
         cls.group = Group.objects.create(
-            title='Тестовая группа',
-            slug='test-slug',
-            description='Тестовое описание',
+            title=GROUP_NAME,
+            slug=GROUP_SLUG,
+            description=GROUP_DESCRIPTION,
         )
         cls.post = Post.objects.create(
             author=cls.user,
             group=cls.group,
-            text='Тестовый пост',
+            text=POST_TEXT,
         )
 
     def setUp(self):
         # Создаём авторизованный клиент
-        self.user = User.objects.create_user(username='HasNoName')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
         self.authorized_client_author = Client()
