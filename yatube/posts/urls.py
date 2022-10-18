@@ -6,14 +6,14 @@ app_name = 'posts'
 
 urlpatterns = [
     path(
-       '',
-       views.index,
-       name='index'
+        '',
+        views.index,
+        name='index'
     ),
     path(
         'group/<slug:slug>/',
         views.group_posts,
-       name='group_posts'
+        name='group_posts'
     ),
     path(
         'profile/<str:username>/',
@@ -23,7 +23,7 @@ urlpatterns = [
     path(
         'posts/<int:post_id>/',
         views.post_detail,
-         name='post_detail'
+        name='post_detail'
     ),
     path(
         'create/',
