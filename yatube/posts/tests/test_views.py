@@ -230,6 +230,15 @@ class PaginatorTests(TestCase):
             reverse(
                 'posts:profile', kwargs={'username': cls.user.username})
         )
+    def setUp(self):
+        cache.clear()
+        # Создаём авторизованный клиент
+        self.user = User.objects.create_user(username=USER_NAME_2)
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.user)
+        self.authorized_client_author = Client()
+        self.authorized_client_author.force_login(self.user)
+
 
     def test_first_page_contains_ten_records(self):
         for test_with_paginator in self.pages_with_paginator:
@@ -243,8 +252,8 @@ class PaginatorTests(TestCase):
     def test_second_page_contains_three_records(self):
         for test_with_paginator in self.pages_with_paginator:
             with self.subTest(test_with_paginator=test_with_paginator):
-                # Проверка: на второй странице должно быть три поста.
-                response = self.authorized_client.get(
+                # Проверка: на второй странице должно быть один поста
+                response = self.authorized_client_author.get(
                     (test_with_paginator) + '?page=2')
                 self.assertEqual(len(response.context['page_obj']), 1)
 
