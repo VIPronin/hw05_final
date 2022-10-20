@@ -11,7 +11,7 @@ from .utils import get_paginator
 @cache_page(20)
 def index(request):
     title = 'Главная страница'
-    page_obj = get_paginator(request, Post.objects.all())  # набор записей д
+    page_obj = get_paginator(request, Post.objects.all())  
     context = dict(
         page_obj=page_obj,
         title=title
@@ -22,7 +22,7 @@ def index(request):
 def group_posts(request, slug):
     title = 'Посты группы'
     group = get_object_or_404(Group, slug=slug)
-    page_obj = get_paginator(request, group.posts.all())  # набор записей д
+    page_obj = get_paginator(request, group.posts.all())  
     context = dict(
         group=group,
         page_obj=page_obj,
@@ -34,11 +34,15 @@ def group_posts(request, slug):
 def profile(request, username):
     title = 'Профиль'
     author = get_object_or_404(User, username=username)
-    page_obj = get_paginator(request, author.posts.all())  # набор записе
+    page_obj = get_paginator(request, author.posts.all())
+    following = Follow.objects.filter(
+                 user=request.user,
+                 author=author).exists()
     context = dict(
         author=author,
         page_obj=page_obj,
-        title=title
+        title=title,
+        following=following
     )
     return render(request, 'posts/profile.html', context)
 

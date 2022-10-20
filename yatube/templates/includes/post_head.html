@@ -2,7 +2,9 @@
 
 <ul>
   <li>
-    Автор:  <span style="color:brown"><b>{{ post.author.username }}<span></b>
+    Автор:  <a href="{% url 'posts:profile' post.author.username %}">
+      <span style="color:brown"><b>{{ post.author.username }}</b></span>
+      </a>
   </li>
   <li>
     Дата публикации: {{ post.pub_date|date:"d E Y" }}
