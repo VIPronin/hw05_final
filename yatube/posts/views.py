@@ -31,19 +31,22 @@ def group_posts(request, slug):
     return render(request, 'posts/group_list.html', context)
 
 
+@login_required()
 def profile(request, username):
-    title = 'Профиль'
-    author = get_object_or_404(User, username=username)
-    page_obj = get_paginator(request, author.posts.all())
-    following = (Follow.objects.filter(user=request.user,
-                                       author=author).exists())
-    context = dict(
-        author=author,
-        following=following,
-        page_obj=page_obj,
-        title=title
-    )
-    return render(request, 'posts/profile.html', context)
+    if request.user.is_authenticated:
+        title = 'Профиль'
+        author = get_object_or_404(User, username=username)
+        page_obj = get_paginator(request, author.posts.all())
+        following = (Follow.objects.filter(user=request.user,
+                                           author=author).exists())
+        context = dict(
+            author=author,
+            following=following,
+            page_obj=page_obj,
+            title=title
+        )
+        return render(request, 'posts/profile.html', context)
+    return render(request)
 
 
 def post_detail(request, post_id):
