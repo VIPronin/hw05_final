@@ -37,8 +37,8 @@ def profile(request, username):
         title = 'Профиль'
         author = get_object_or_404(User, username=username)
         page_obj = get_paginator(request, author.posts.all())
-        following = (Follow.objects.filter(user=request.user,
-                                           author=author).exists())
+        following = Follow.objects.filter(user=request.user,
+                                          author=author).exists()
         context = dict(
             author=author,
             following=following,
