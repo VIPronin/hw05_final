@@ -230,6 +230,7 @@ class PaginatorTests(TestCase):
             reverse(
                 'posts:profile', kwargs={'username': cls.user.username})
         )
+
     def setUp(self):
         cache.clear()
         # Создаём авторизованный клиент
@@ -238,7 +239,6 @@ class PaginatorTests(TestCase):
         self.authorized_client.force_login(self.user)
         self.authorized_client_author = Client()
         self.authorized_client_author.force_login(self.user)
-
 
     def test_first_page_contains_ten_records(self):
         for test_with_paginator in self.pages_with_paginator:
