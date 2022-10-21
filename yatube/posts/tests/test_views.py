@@ -253,7 +253,7 @@ class PaginatorTests(TestCase):
         for test_with_paginator in self.pages_with_paginator:
             with self.subTest(test_with_paginator=test_with_paginator):
                 # Проверка: на второй странице должно быть один поста
-                response = self.authorized_client_author.get(
+                response = self.authorized_client.get(
                     (test_with_paginator) + '?page=2')
                 self.assertEqual(len(response.context['page_obj']), 1)
 
