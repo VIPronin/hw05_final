@@ -40,13 +40,12 @@ def profile(request, username):
         following = Follow.objects.filter(user=request.user,
                                           author=author).exists()
     context = dict(
-            author=author,
-            following=following,
-            page_obj=page_obj,
-            title=title
-        )
+        author=author,
+        following=following,
+        page_obj=page_obj,
+        title=title
+    )
     return render(request, 'posts/profile.html', context)
-    
 
 
 def post_detail(request, post_id):
