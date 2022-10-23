@@ -26,6 +26,8 @@ SECRET_KEY = '^uml5ru%tz$l=l)dpzvw!kgu)ezjw0!p@c-##rg3rg*rc4z4ps'
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    'www.vipronin.pythonanywhere.com',
+    'VIPronin.pythonanywhere.com',
     'localhost',
     '127.0.0.1',
     '[::1]',
@@ -47,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'sorl.thumbnail',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -57,6 +60,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware'
+]
+# Добавьте IP адреса, при обращении с которых будет доступен DjDT
+
+INTERNAL_IPS = [
+    '127.0.0.1',
 ]
 
 ROOT_URLCONF = 'yatube.urls'
